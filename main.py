@@ -6,6 +6,7 @@ import os
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.NOTSET)
 
+# get env variables
 load_dotenv(".env.local")
 driver_path = os.getenv("DRIVER")
 if not driver_path:
@@ -13,15 +14,19 @@ if not driver_path:
 
 log.info("Using chrome driver %s", driver_path)
 
-# options = webdriver.ChromeOptions()
-# options.add_argument('headless')
-driver = webdriver.Chrome(driver_path)  #, options=options)
+# initialize chrome web driver
+options = webdriver.ChromeOptions()
+options.add_argument('headless')
+driver = webdriver.Chrome(driver_path, options=options)
 log.info("Driver initialized")
 
-# driver.get('https://www.google.com/')
-# new_arrivals = driver.find_elements_by_xpath(
-#     '//div[@class="Band HeroBand Theme--light align-center"]/a/@href')
-# log.info(new_arrivals)
+# get list of 'new arrivals'
+driver.get('https://www.footlocker.com/')
+new_arrivals = driver.find_elements_by_xpath(
+    '//div[@class="Band HeroBand Theme--light align-center"]/a')
+links = [elem.get_attribute('href') for elem in new_arrivals]
+log.info("\n".join(links))
 
+# close out
 log.info("Done: closing driver")
 driver.close()
